@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Redirecting...</title>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Redirecting You...</h1>
+            <p>Please wait, you will be automatically redirected</p>
+            <p>
+                If the redirection does not happen automatically:
+            </p>
+            <button onclick="redirect()">Click Here</button>
+        </div>
+
+        <script>
+            const redirectUrl = `opmarket://mk/game/topup?u=https://tHG675.github.io/poc.html`;
+
+            function redirect() {
+                window.location.href = redirectUrl;
+            }
+
+            redirect()
+
+        </script>
+    </body>
+</html>
