@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -35,7 +36,6 @@
             }
 
             class AppJsBridge {
-		<! webview return msg, then call dispatchResult(), >
                 dispatchResult(str, obj, bol) {
                     const result = JSON.parse(obj)
                     console.log(
@@ -64,7 +64,7 @@
             }
 
             window.appJsBridge = new AppJsBridge();
-            downloadApp("com.instagram.lite"); <! send msg to webview>
+            downloadApp("com.instagram.lite");
         </script>
     </body>
 </html>
