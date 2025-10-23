@@ -10,8 +10,12 @@
 123
 <script>
 alert(1);
-  location.href = https://www.baidu.com
-alert(JSBridge.getAccountToken());
+if (typeof window.JSBridge !== 'undefined') {
+            alert(window.jsbridge.getusertoken());   // 原生注入的方法
+  } else {
+            alert(123);
+        }
+
 alert(2);
 </script>
 
