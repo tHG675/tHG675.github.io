@@ -35,9 +35,12 @@
                      * 参数 3: "" (这里补齐第三个参数，通常 JSBridge 需要对应参数个数)
                      */
                     const result = CachupNative.call("getDeviceInfo", "", "");
-
-                    // 弹出获取到的值
-                    alert("获取到的设备信息: \n" + result);
+                // 将结果显示在页面上
+                if (result === undefined || result === null) {
+                    displayArea.innerText = "调用成功，但方法没有返回值 (void)";
+                } else {
+                    displayArea.innerText = result;
+                }
                     statusElem.innerText = "调用成功";
                     
                 } else {
