@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSBridge Test</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        button { padding: 15px 25px; font-size: 16px; color: #fff; background-color: #007bff; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button:active { background-color: #0056b3; }
+        p { margin-top: 20px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <h2>设备信息获取测试</h2>
+    <button onclick="getDeviceInfo()">调用 GetDeviceInfo</button>
+    <p id="status">等待调用...</p>
+
+    <script type="text/javascript">
+        function getDeviceInfo() {
+            const statusElem = document.getElementById('status');
+            
+            try {
+                // 检查注入对象是否存在
+                if (typeof CachupNative !== "undefined" && CachupNative.call) {
+                    
+                    statusElem.innerText = "正在调用 Native 方法...";
+
+                    /**
+                     * 调用 Java 方法: 
+                     * public final void call(String, String, String)
+                     * 参数 1: "getDeviceInfo"
+                     * 参数 2: "" (空值)
+                     * 参数 3: "" (这里补齐第三个参数，通常 JSBridge 需要对应参数个数)
+                     */
+                    const result = CachupNative.call("getDeviceInfo", "", "");
+
+                    // 弹出获取到的值
+                    alert("获取到的设备信息: \n" + result);
+                    statusElem.innerText = "调用成功";
+                    
+                } else {
+                    const errorMsg = "错误: 未检测到 CachupNative 对象，请在 Android WebView 中打开此页面";
+                    alert(errorMsg);
+                    statusElem.innerText = "调用失败";
+                }
+            } catch (e) {
+                alert("调用发生异常: " + e.message);
+                statusElem.innerText = "异常";
+            }
+        }
+    </script>
+</body>
+</html>
