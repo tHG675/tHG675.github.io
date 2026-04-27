@@ -1,1 +1,166 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyTap JSBridge 演示（com.heytap.jsbridge）</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 12px; line-height: 1.5; }
+    h1 { font-size: 1.1rem; margin: 0 0 8px; }
+    #out {
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 120px;
+      font-size: 13px;
+    }
+    .hint { color: #666; font-size: 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>appJsBridge 演示页</h1>
+  <p class="hint">在 App WebView 中打开本页；桌面浏览器无 bridge 时下方仅显示提示。</p>
+  <div id="out"></div>
+
+  <script>
+    /**
+     * com.coloros.video / HeyTap JSBridge H5 示例
+     * 与 Jadx 中 com.heytap.jsbridge.BridgeClient 注入的 window.appJsBridge 一致：
+     * - callApi(method, parameters, callback?)
+     * - CommonObj 注册名为 commonObj，无参 API 示例：commonObj.getImei
+     * - 注入完成后会 dispatch JsBridgeReady；未注入前可用 window.bridgePendingCallbacks
+     */
+
+    (function () {
+      'use strict';
+
+      var outEl = document.getElementById('out');
+
+      function log() {
+        var line = Array.prototype.slice.call(arguments).map(function (a) {
+          try {
+            return typeof a === 'object' ? JSON.stringify(a) : String(a);
+          } catch (e) {
+            return String(a);
+          }
+        }).join(' ');
+        if (typeof console !== 'undefined' && console.log) {
+          console.log.apply(console, arguments);
+        }
+        if (outEl) {
+          outEl.textContent += line + '\n';
+        }
+      }
+
+      function whenAppJsBridgeReady(fn) {
+        if (typeof fn !== 'function') return;
+
+        if (window.appJsBridge && typeof window.appJsBridge.callApi === 'function') {
+          try {
+            fn(window.appJsBridge);
+          } catch (e) {
+            log('[JsBridge] ready 回调异常', e && e.message ? e.message : e);
+          }
+          return;
+        }
+
+        document.addEventListener(
+          'JsBridgeReady',
+          function onReady() {
+            document.removeEventListener('JsBridgeReady', onReady);
+            if (window.appJsBridge && typeof window.appJsBridge.callApi === 'function') {
+              try {
+                fn(window.appJsBridge);
+              } catch (e) {
+                log('[JsBridge] JsBridgeReady 后执行异常', e && e.message ? e.message : e);
+              }
+            } else {
+              log('[JsBridge] JsBridgeReady 已触发但 appJsBridge 不可用');
+            }
+          },
+          false
+        );
+
+        window.bridgePendingCallbacks = window.bridgePendingCallbacks || [];
+        window.bridgePendingCallbacks.push(function (bridge) {
+          try {
+            fn(bridge);
+          } catch (e) {
+            log('[JsBridge] bridgePendingCallbacks 执行异常', e && e.message ? e.message : e);
+          }
+        });
+      }
+
+      function callNative(method, parameters, callback) {
+        if (!window.appJsBridge || typeof window.appJsBridge.callApi !== 'function') {
+          log('[JsBridge] appJsBridge.callApi 不存在');
+          return undefined;
+        }
+        return window.appJsBridge.callApi(method, parameters, callback);
+      }
+
+      function getImeiSync() {
+        return callNative('commonObj.getImei', '');
+      }
+
+      function getImeiAsync(done) {
+        callNative('commonObj.getImei', '', function (result) {
+          if (typeof done === 'function') done(result);
+        });
+      }
+
+      function getAvailableApisSync() {
+        return callNative('getAvailableApis', '');
+      }
+
+      function main() {
+        if (!window.appJsBridge) {
+          log('[JsBridge] 等待注入…（若在系统浏览器打开将一直无 bridge）');
+        }
+        whenAppJsBridgeReady(function (bridge) {
+          log('[JsBridge] 已就绪');
+
+          var imeiSync = bridge.callApi('commonObj.getImei', '');
+          log('[JsBridge] getImei 同步返回值:', imeiSync);
+
+          bridge.callApi('commonObj.getImei', '', function (imeiAsync) {
+            log('[JsBridge] getImei 异步回调:', imeiAsync);
+          });
+
+          try {
+            var apis = bridge.callApi('getAvailableApis', '');
+            log('[JsBridge] getAvailableApis:', apis);
+          } catch (e) {
+            log('[JsBridge] getAvailableApis 异常', e && e.message ? e.message : e);
+          }
+
+          if (typeof window.onAppJsBridgeDemoComplete === 'function') {
+            window.onAppJsBridgeDemoComplete({
+              imeiSync: imeiSync,
+              bridge: bridge
+            });
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', main);
+      } else {
+        main();
+      }
+
+      window.AppJsBridgeDemo = {
+        whenAppJsBridgeReady: whenAppJsBridgeReady,
+        callNative: callNative,
+        getImeiSync: getImeiSync,
+        getImeiAsync: getImeiAsync,
+        getAvailableApisSync: getAvailableApisSync
+      };
+    })();
+  </script>
+</body>
+</html>
