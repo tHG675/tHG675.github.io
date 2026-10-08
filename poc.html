@@ -1,1 +1,29 @@
-11111
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>onShowFileChooser Vuln</title>
+</head>
+<body>
+  <h1>onShowFileChooser Vuln</h1>
+  <div>
+    <input type="file" id="file-input" onchange="blobCallback()">
+    <label for="file-input">Select File</label>
+    <pre id="log"></pre>
+  </div>
+  <script>
+    function log_(msg) {
+      document.getElementById('log').textContent += msg + '\n';
+    }
+    function blobCallback() {
+      var selectedFile = document.getElementById("file-input").files[0];
+      var reader = new FileReader();
+      reader.readAsText(selectedFile);
+      reader.onload = function() {
+        log_(this.result); // 将文件内容显示在界面上
+      }
+    }
+  </script>
+</body>
+</html>
