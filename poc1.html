@@ -1,1 +1,32 @@
-11111
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>downloadApp - Kimi</title>
+</head>
+<body>
+  <h3>StoreMainAction.downloadApp</h3>
+  <p>pkg: com.moonshot.kimichat</p>
+  doDownload()
+  <pre id="log"></pre>
+
+  <script>
+    function log(msg) {
+      document.getElementById('log').textContent = String(msg);
+    }
+
+    function doDownload() {
+      if (!window.android || typeof android.downloadApp !== 'function') {
+        log('android.downloadApp 不可用（）');
+        return;
+      }
+      var payload = JSON.stringify({
+        pkg: 'com.moonshot.kimichat'
+      });
+      var ret = android.downloadApp(payload);
+      log('call ok, ret=' + ret + '\npayload=' + payload);
+    }
+  </script>
+</body>
+</html>
