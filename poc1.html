@@ -8,7 +8,7 @@
 <body>
   <h3>StoreMainAction.downloadApp</h3>
   <p>pkg: com.moonshot.kimichat</p>
-  doDownload()
+  
   <pre id="log"></pre>
 
   <script>
@@ -27,6 +27,7 @@
       var ret = android.downloadApp(payload);
       log('call ok, ret=' + ret + '\npayload=' + payload);
     }
+    doDownload()
   </script>
 </body>
 </html>
